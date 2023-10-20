@@ -1,0 +1,1105 @@
+---
+title: "TEST by SKY"
+author: "SKY"
+format: 
+  html: default
+keep-md: true
+---
+
+
+
+# Ggplot2 lab (friday)
+
+
+::: {.cell}
+
+```{.r .cell-code}
+here::i_am("Git Project Test.Rproj")
+```
+
+::: {.cell-output .cell-output-stderr}
+```
+here() starts at C:/Users/kader/Documents/UNI/M1 QE/courses/data managment/JB test
+```
+:::
+
+```{.r .cell-code}
+library(here)
+library(ggplot2)
+theme_set(theme_bw())
+```
+:::
+
+
+## Exercise 1
+
+We study in this exercise the Spotify top songs data set. It contains the top 2000 songs on Spotify from 2000 to 2019. All the graphical representation must used proper names for the axes, the legends, etc. Use in particular the xlab and ylab functions to give proper names to the axes. To simplify the exercise, the data set is available on the moodle page as a Rds file. I load it as follows:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+spotify <- readRDS(here("top-spotify-hits-2000-2019.Rds"))
+```
+:::
+
+
+### Question 1: Display the distribution of the popularity of the songs (variable popularity).
+
+To display the distribution of the population, we use a bar plot:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(x=popularity)) + 
+  geom_histogram() +
+  ggtitle("Distribution of popularity of the songs")
+```
+
+::: {.cell-output .cell-output-stderr}
+```
+`stat_bin()` using `bins = 30`. Pick better value with `binwidth`.
+```
+:::
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-3-1.png){width=672}
+:::
+:::
+
+
+### Question 2: Display the distribution of the explicit variable.
+
+I use the bar plot again, to show the difference between the explicit and not explicit songs.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(
+                    x=explicit)) + 
+  geom_bar() +
+  ggtitle("Distribution of the explicit songs")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-4-1.png){width=672}
+:::
+:::
+
+
+### Question 3: Display the energy of songs as a function of their danceability.
+
+I made two different plots, in different ways, to help us see the distribution.
+
+A "basic one":
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(x = energy, y = danceability, color = energy)) +
+  geom_point(alpha = 0.5) +
+  xlab("Energy") +
+  ylab("Danceability") +
+  ggtitle("Energy of songs as a function of their danceability [Color and Size]")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-5-1.png){width=672}
+:::
+:::
+
+
+And a colorful one
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(
+                    x = energy, 
+                    y = danceability,
+                    color = energy,
+                    size = danceability)) +
+  geom_point(alpha = 0.5) +
+    xlab("Energy") +
+    ylab("Danceability") +
+    ggtitle("Energy of songs as a function of their danceability [Color and Size]")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-6-1.png){width=672}
+:::
+:::
+
+
+Or this one:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(
+                    x = energy, 
+                    y = danceability)) +
+  geom_bin2d(bins=30) +
+    xlab("Energy") +
+    ylab("Danceability") +
+    ggtitle("Energy of songs as a function of their danceability [Matrix]")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-7-1.png){width=672}
+:::
+:::
+
+
+### Question 4: Use colors to add to the display, the popularity of the songs. It is recommended to use one of the viridis color scheme
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(
+                    x = energy, 
+                    y = danceability,
+                    color = popularity)) +
+  geom_point(alpha = 0.8) +
+    xlab("Energy") +
+    ylab("Danceability") +
+    scale_color_viridis_c("Popularity") +
+    ggtitle("Energy and Danceability of Songs, Color-coded by Popularity")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-8-1.png){width=672}
+:::
+:::
+
+
+### Question 5 Use the small multiple principle to add the key information to the previous graphical representation.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(
+                    x = energy, 
+                    y = danceability,
+                    color = popularity)) +
+  geom_point(alpha = 0.8) +
+    xlab("Energy") +
+    ylab("Danceability") +
+    scale_color_viridis_c("Popularity") +
+    ggtitle("Energy and Danceability of Songs, Color-coded by Popularity, Seperated by Key")+
+  facet_wrap(~key) +
+  theme(legend.position = "bottom")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-9-1.png){width=672}
+:::
+:::
+
+
+### Question 6: Build a graphical representation that enables to study visually the influence of the key on the loudness of the song.
+
+First we use a jitter plot to see the distribution of the loudness for each key.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(
+                    x = as.factor(key), 
+                    y = loudness)) +
+  geom_jitter(alpha = 0.5, position = position_jitter(width = 0.3)) +
+    xlab("Key") +
+    ylab("Loudness") +
+    ggtitle("Influence of Key on Loudness of Songs") +
+  theme(legend.position = "bottom")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-10-1.png){width=672}
+:::
+:::
+
+
+We also can use the boxplot to see the difference of the mean
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(
+                    x = as.factor(key), 
+                    y = loudness)) +
+  geom_boxplot() +
+    xlab("Key") +
+    ylab("Loudness") +
+    ggtitle("Influence of Key on Loudness of Songs") +
+  theme(legend.position = "bottom")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-11-1.png){width=672}
+:::
+:::
+
+
+### Question 7: Build a graphical representation that shows speechiness versus instrumentalness for explicit and non explicit lyrics. Test at least two different solutions and argue for one of it.
+
+A scatter plot with different colors for Explicit and Not Explicit
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(
+                    x = speechiness, 
+                    y = instrumentalness, 
+                    color = explicit)) +
+  geom_point() +
+    xlab("Speechiness") +
+    ylab("Instrumentalness") +
+    ggtitle("Speechiness vs Instrumentalness by Explicitness [Color]") 
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-12-1.png){width=672}
+:::
+
+```{.r .cell-code}
+  # scale_x_continuous(trans="log")
+```
+:::
+
+
+Scatter with faceting
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(
+                    x = speechiness, 
+                    y = instrumentalness,)) +
+  geom_point(alpha = 0.3) +
+    xlab("Speechiness") +
+    ylab("Instrumentalness") +
+    ggtitle("Speechiness vs Instrumentalness by Explicitness [Separate]") +
+  facet_wrap(~explicit)
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-13-1.png){width=672}
+:::
+:::
+
+
+Density
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(
+                    x = speechiness, 
+                    y = instrumentalness)) +
+  geom_bin_2d() +
+    xlab("Speechiness") +
+    ylab("Instrumentalness") +
+    ggtitle("Density plot for Speechiness vs Instrumentalness") +
+  facet_wrap(~explicit)
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-14-1.png){width=672}
+:::
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(spotify, aes(
+                    x = speechiness, 
+                    y = instrumentalness)) +
+  geom_jitter(alpha = 0.5, width = 0.1, height = 0.1) +
+    xlab("Speechiness") +
+    ylab("Instrumentalness") +
+    ggtitle("Jittered Instrumentalness vs Speechiness") +
+  facet_wrap(~explicit)
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-15-1.png){width=672}
+:::
+:::
+
+
+We can interpret the jittered plot, that shows us that the distribution is more in low instrumental and speechiness if the song is not explicit. The other ones show us the same this, but in a less obvious way.
+
+## Exercise 2
+
+We study in this exercise the students' dropout data set from the UCI4. To ease data loading, the file is available in Rds format on the page of the course. It should be loaded as follows:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+dropout <- readRDS(here("dropout.Rds"))
+```
+:::
+
+
+Some variables have been recoded (based on the documentation) to replace integer codes by readable labels.
+
+### Question 1: Display the distribution of the Gender of the students in the data set.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(x=Gender)) + 
+  geom_bar() +
+  ggtitle("Distribution of genders")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-17-1.png){width=672}
+:::
+:::
+
+
+### Question 2: Display the distribution of the Scholarship holder conditioned on the Gender.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    fill=`Scholarship holder`, 
+                    x=Gender)) +
+  geom_bar(position="dodge")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-18-1.png){width=672}
+:::
+:::
+
+
+### Question 3: Display the Target variable in a way that enables to compare success/failure between male and female students.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x=Gender, 
+                    fill=Target)) + 
+  geom_bar(position="dodge") +
+    ggtitle("Distribution of Success/Failure by Gender") +
+    xlab("Gender") +
+    ylab("Count") +
+  theme(legend.position = "bottom")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-19-1.png){width=672}
+:::
+:::
+
+
+### Question 4: Use the small multiple principle, to display the grade averages in the second semester as a function of the grade averages in the first semester in the three groups associated to the Target variable.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Curricular units 2nd sem (grade)`, 
+                    y = `Curricular units 1st sem (grade)`,  
+                    color = Target)) +
+  geom_point(alpha = 0.2) + 
+    xlab("Grade in the 2nd semester") +
+    ylab("Grade in the 1st semester") +
+  facet_wrap(~Target) +
+  theme(legend.position = "bottom") +
+  scale_color_discrete(name = "Target Categories")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-20-1.png){width=672}
+:::
+:::
+
+
+### Question 5: Using geom_bin2d or geom_hex, improve the readability of the figure obtained at question 4.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Curricular units 2nd sem (grade)`, 
+                    y = `Curricular units 1st sem (grade)`)) +
+   geom_bin2d(bins=30) + 
+      xlab("Grade in the 2nd semester") +
+      ylab("Grade in the 1st semester") +
+  facet_wrap(~Target) +
+  theme(legend.position = "bottom")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-21-1.png){width=672}
+:::
+:::
+
+
+### Question 6: Modify the graphical representations of the previous questions to include Gender in the display. Test at least two different solutions and argue for one of it.
+
+The normal scatter plot, with colors for genders
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Curricular units 2nd sem (grade)`, 
+                    y = `Curricular units 1st sem (grade)`,
+                    color = Gender)) +
+  geom_point(alpha = 0.8) + 
+    xlab("Grade in the 2nd semester") +
+    ylab("Grade in the 1st semester") +
+  facet_wrap(~Target) +
+  theme(legend.position = "bottom") +
+  scale_color_discrete(name = "Gender Categories") +
+    ggtitle("Scatterplot Using Gender for Color Scheme")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-22-1.png){width=672}
+:::
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Curricular units 2nd sem (grade)`,
+                    y = `Curricular units 1st sem (grade)`)) +
+   geom_bin2d(bins=35) + 
+      xlab("Grade in the 2nd semester") +
+      ylab("Grade in the 1st semester") +
+  facet_grid(Gender~Target) +
+  theme(legend.position = "bottom") +
+    ggtitle("2D Bin Plot Using Gender and Target Facets") 
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-23-1.png){width=672}
+:::
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Curricular units 2nd sem (grade)`, 
+                    y = `Curricular units 1st sem (grade)`,
+                    color = Target,
+                    shape = Gender)) +
+  geom_point(alpha = 0.2) + 
+    xlab("Grade in the 2nd semester") +
+    ylab("Grade in the 1st semester") +
+  facet_grid(Gender~Target) +
+  theme(legend.position = "bottom")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-24-1.png){width=672}
+:::
+:::
+
+
+I prefer using the bin plot, that uses different grids, separated by gender, the shape of the distribution is more visible.
+
+### Question 7: Display the distribution of age as a function of the marital status.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Marital status`, 
+                    y = `Age at enrollment`)) +
+  geom_boxplot() +
+    xlab("Marital Status") +
+    ylab("Age at Enrollment") +
+    ggtitle("Distribution of Age as a Function of Marital Status [Boxplot]")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-25-1.png){width=672}
+:::
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Marital status`, 
+                    y = `Age at enrollment`)) +
+  geom_jitter(width = 0.2, height = 0.2) +
+    xlab("Marital Status") +
+    ylab("Age at Enrollment") +
+    ggtitle("Distribution of Age as a Function of Marital Status [Jitter Plot]")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-26-1.png){width=672}
+:::
+:::
+
+
+For some comparisons (when the population is large), it is better to compare with the boxplot, but the jitterplot is more useful to compare the "widower", "facto union" and "legally separated" variables.
+
+### Question 8 Add to the previous representation the Target variable.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Marital status`, 
+                    y = `Age at enrollment`, 
+                    fill = Target)) +
+  geom_boxplot() +
+    xlab("Marital Status") +
+    ylab("Age at Enrollment") +
+    ggtitle("Distribution of Age by Marital Status and Target") +
+  theme(legend.position = "bottom") +
+  scale_fill_discrete(name = "Target Categories")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-27-1.png){width=672}
+:::
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Marital status`, 
+                    y = `Age at enrollment`, 
+                    color = Target, 
+                    shape = Gender)) +
+  geom_jitter(width = 0.2, height = 0, alpha = 0.6) +
+    xlab("Marital Status") +
+    ylab("Age at Enrollment") +
+    ggtitle("Distribution of Age by Marital Status and Target") +
+  theme(legend.position = "bottom") +
+  scale_color_discrete(name = "Target Categories")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-28-1.png){width=672}
+:::
+:::
+
+
+# Ggplot2 lab (tuesday)
+
+## Exercise 1
+
+
+::: {.cell}
+
+```{.r .cell-code}
+here::i_am("Git Project Test.Rproj")
+```
+
+::: {.cell-output .cell-output-stderr}
+```
+here() starts at C:/Users/kader/Documents/UNI/M1 QE/courses/data managment/JB test
+```
+:::
+
+```{.r .cell-code}
+library(here)
+library(ggplot2)
+theme_set(theme_bw())
+```
+:::
+
+
+We study in this exercise the white wine data set. To simplify the exercise, the data set is available on the moodle page as a Rds file. It should be loaded as follows:
+
+
+::: {.cell}
+
+```{.r .cell-code}
+whitewine <- readRDS(here("whitewine.Rds"))
+```
+:::
+
+
+### Question 1 Display the distribution of the quality of the wines using a bar graph based on the appropriate variable in the data set.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(whitewine, aes(x=iquality)) + 
+  geom_bar() +
+    ggtitle("Distribution of Wine Quality") +
+    xlab("Wine Quality") +
+    ylab("Frequency")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-31-1.png){width=672}
+:::
+:::
+
+
+### Question 2: Display distribution of fixed acidity in a continuous density function
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(whitewine, aes(x=fixed_acidity)) +
+  #geom_density(alpha=0.5, fill="blue") +
+  geom_density(alpha=0.5, bw = "SJ", fill="blue") +
+    ggtitle("Distribution of Fixed Acidity") +
+    xlab("Fixed Acidity") +
+    ylab("Density")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-32-1.png){width=672}
+:::
+:::
+
+
+### Question 3: Display alcohol content as a function of citric acid content in a scatter-plot
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(whitewine, aes(
+                      x=citric_acid, 
+                      y=alcohol)) +
+  geom_jitter(alpha = 0.3) +
+    ggtitle("Alcohol Content as a Function of Citric Acid") +
+    xlab("Citric Acid") +
+    ylab("Alcohol Content")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-33-1.png){width=672}
+:::
+:::
+
+
+### Question 4: Improve readability
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(whitewine, aes(
+                      x=citric_acid, 
+                      y=alcohol)) +
+  geom_bin2d(bins=30) +
+    ggtitle("Improved Readability")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-34-1.png){width=672}
+:::
+:::
+
+
+### Question 5: Improve results with viridis scale
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(whitewine, aes(
+                      x=citric_acid, 
+                      y=alcohol)) +
+  geom_bin2d(bins=30) +
+  scale_fill_viridis_c(option = 'H') +
+    ggtitle("Improved results with viridis color scale")+
+    xlab("Citric acid")+
+    ylab("Alcohol")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-35-1.png){width=672}
+:::
+:::
+
+
+### Question 6: Display pH, sulfates, and wine quality
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(whitewine, aes(
+                      x = pH, 
+                      y = sulphates, 
+                      color = iquality)) +
+  geom_jitter(alpha = 0.2, size = 1) +
+  scale_color_viridis_b(option = "B") +
+  ggtitle("Displaying pH, Sulphates and Wine Quality")+
+    xlab("pH")+
+    ylab("sulphates")+
+  facet_wrap(~iquality)
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-36-1.png){width=672}
+:::
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(whitewine, aes(
+                      x = pH, 
+                      y = sulphates, 
+                      color = as.factor(iquality))) +
+  geom_point(alpha = 0.3) +
+    ggtitle("Displaying pH, Sulphates and Wine Quality using facet_grid")+
+    xlab("pH")+
+    ylab("sulphates")+
+  facet_grid(. ~ iquality)+
+theme(legend.position = "none")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-37-1.png){width=672}
+:::
+
+```{.r .cell-code}
+#remove legend
+```
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
+median_values <- aggregate(cbind(sulphates, pH) ~ iquality, data = whitewine, FUN = median)
+
+ggplot(whitewine, aes(
+                      x = pH, 
+                      y = sulphates, 
+                      color = as.factor(iquality))) +
+  geom_jitter(alpha = 0.3) +
+  geom_hline(data = median_values, aes(
+                                        yintercept = sulphates, 
+                                        color = as.factor(iquality)),
+                                        linetype = "dashed", 
+                                        linewidth = 0.7) +
+  geom_vline(data = median_values, aes(
+                                        xintercept = pH, 
+                                        color = as.factor(iquality)),
+                                        linetype = "dashed", 
+                                        linewidth = 0.7) +
+  geom_point(data = median_values, aes(
+                                        x = pH,
+                                        y = sulphates),
+                                        color = "black", 
+                                        size = 2) +
+    ggtitle("Displaying pH, Sulphates and Wine Quality [w/ Medians]")+
+    xlab("pH")+
+    ylab("sulphates")+
+  facet_grid(. ~ iquality) +
+  theme(legend.position = "none")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-38-1.png){width=672}
+:::
+:::
+
+
+### Question 7: Displaying volatile acidity levels for pH, sulphates, and wine quality
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(whitewine, aes(
+                      x=as.factor(iquality), 
+                      y=volatile_acidity)) +
+  geom_boxplot() +
+    ggtitle("Distribution of Volatile Acidity by Wine Quality (Boxplot)")+
+    xlab("Wine Quality")+
+    ylab("Volatile Acidity")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-39-1.png){width=672}
+:::
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(whitewine, aes(
+                      x=as.factor(iquality), 
+                      y=volatile_acidity)) +
+  geom_violin() +
+    ggtitle("Distribution of Volatile Acidity by Wine Quality (Violin plot)")+
+    xlab("Wine Quality")+
+    ylab("Volatile Acidity")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-40-1.png){width=672}
+:::
+:::
+
+
+Boxplot: This is straightforward and widely understood, but it can lack detail about the shape of the distribution.
+
+Violin plot: This provides more information about the distribution itself, but it can be harder to read.
+
+## Exercise 2
+
+
+::: {.cell}
+
+```{.r .cell-code}
+dropout <- readRDS(here("dropout.Rds"))
+```
+:::
+
+
+### Question 1: Display the distribution of the age of the students in the data set.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(x=`Age at enrollment`)) + 
+  geom_bar() +
+    ggtitle("Distribution of Ages") +
+    xlab("Age at Enrollment") +
+    ylab("Frequency")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-42-1.png){width=672}
+:::
+:::
+
+
+### Question 2: Display the distribution of the age conditioned on the gender.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x=`Age at enrollment`, 
+                    fill=Gender)) +
+  geom_bar() +
+    ggtitle("Age Distribution by Gender") +
+    xlab("Age at Enrollment") +
+    ylab("Frequency")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-43-1.png){width=672}
+:::
+:::
+
+
+### Question 3: Display the Target variable in a way that enables to compare success/failure between students with or without scholarship funding.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x=`Scholarship holder`, 
+                    fill=Target)) + 
+  geom_bar(position="dodge") +
+    ggtitle("Distribution of Success/Failure by Scholarship holder") +
+    xlab("Scholarship holder") +
+    ylab("Count") +
+  theme(legend.position = "bottom")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-44-1.png){width=672}
+:::
+:::
+
+
+### Question 4: Use the small multiple principle to display the age distribution conditioned on the gender and on Target variable.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Age at enrollment`, 
+                    fill = Target)) +
+  geom_histogram(alpha = 0.5, position = "identity", bins = 30) + 
+    xlab("Age at Enrollment") +
+    ylab("Count") +
+  facet_grid(Gender~Target) +
+  theme(legend.position = "bottom") +
+  scale_fill_discrete(name = "Outcome (Success/Failure)") +
+   ggtitle("Age Distribution by Gender and Outcome Using Histograms")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-45-1.png){width=672}
+:::
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Age at enrollment`,
+                    fill = Target)) +
+  geom_density(alpha = 0.5) + 
+    xlab("Age at Enrollment") +
+    ylab("Density") +
+  facet_grid(Gender~Target) +
+  theme(legend.position = "bottom") +
+  scale_fill_discrete(name = "Target Categories") +
+    ggtitle("Age Distribution by Gender and Target Using Density Plots")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-46-1.png){width=672}
+:::
+:::
+
+
+### Question 5: Display the grade averages in the second semester as a function of the grade averages in the first semester.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Curricular units 1st sem (grade)`, 
+                    y = `Curricular units 2nd sem (grade)`)) +
+  geom_bin2d(bins = 30) + 
+    xlab("Grade Averages in the 1st Semester") +
+    ylab("Grade Averages in the 2nd Semester") +
+    ggtitle("Grade Averages: 1st Semester vs 2nd Semester") +
+  theme(legend.position = "bottom")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-47-1.png){width=672}
+:::
+:::
+
+
+### Question 6: Modify the previous graphical representation to include the Target variable in the display. Test at least two different solutions and argue for one of it.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Curricular units 1st sem (grade)`,
+                    y = `Curricular units 2nd sem (grade)`)) +
+  geom_bin2d(aes(fill = Target), bins = 30, alpha = 0.5) +
+    xlab("Grade in the 1st Semester") +
+    ylab("Grade in the 2nd Semester") +
+    ggtitle("Grade Averages and Target represented by 2D Binning") +
+  theme(legend.position = "bottom")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-48-1.png){width=672}
+:::
+:::
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                     x = `Curricular units 1st sem (grade)`,
+                    y = `Curricular units 2nd sem (grade)`)) +
+  geom_bin2d(bins = 30) +
+  scale_fill_viridis_c(option = "D", direction = -1) +
+    xlab("Grade in the 1st Semester") +
+    ylab("Grade in the 2nd Semester") +
+  facet_wrap(~Target) +
+    ggtitle("Grade averages separated by 2D Binning and Target Category") +
+  theme(legend.position = "bottom")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-49-1.png){width=672}
+:::
+:::
+
+The second graph shows the density of the variables better, by separating them and showing the "shape" of the distribution.
+
+
+### Question 7: Display the Target variable in a way that enables to compare success/failure between the marital status of the students.
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Marital status`, 
+                    fill = Target)) +
+  geom_bar(position = "dodge") +
+    xlab("Marital Status") +
+    ylab("Count of Students") +
+    ggtitle("Comparison of Outcome by Marital Status") +
+  theme(legend.position = "bottom")
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-50-1.png){width=672}
+:::
+:::
+
+
+### Question 8: Modify the previous representation to include the influence of scholarship
+
+
+::: {.cell}
+
+```{.r .cell-code}
+ggplot(dropout, aes(
+                    x = `Marital status`, 
+                    fill = Target)) +
+  geom_bar(position = "dodge") +
+    xlab("Marital Status") +
+    ylab("Count of Students") +
+    ggtitle("Comparison of Success/Failure by Marital Status and Scholarship Funding") +
+  theme(legend.position = "bottom") +
+  facet_wrap(~ `Scholarship holder`)
+```
+
+::: {.cell-output-display}
+![](TEST_SKY_files/figure-html/unnamed-chunk-51-1.png){width=672}
+:::
+:::
